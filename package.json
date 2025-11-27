@@ -1,0 +1,17 @@
+{
+  "name": "motioncare",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "bootstrap": "npm install",
+    "dev": "cd apps/web && npm install && npm run dev",
+    "lint": "echo 'Add linting scripts'",
+    "test": "echo 'Add tests'"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

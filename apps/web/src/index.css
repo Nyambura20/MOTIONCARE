@@ -1,0 +1,180 @@
+/* Import Inter font family - must come before Tailwind directives */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+@layer base {
+  body {
+    @apply font-body text-gray900 bg-gray50 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+  
+  * {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Card Components */
+  .card {
+    @apply bg-white rounded-xl border border-gray200 shadow-clinical p-6 transition-all duration-normal;
+  }
+  
+  .card:hover {
+    @apply shadow-lg -translate-y-0.5;
+  }
+  
+  .card-accent-left {
+    @apply border-l-4 border-l-primary;
+  }
+  
+  /* Button Components */
+  .btn {
+    @apply font-medium rounded-lg transition-all duration-fast inline-flex items-center justify-center gap-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary hover:bg-primaryDark text-white px-4 py-2.5 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-white hover:bg-primary text-primary hover:text-white border-2 border-primary px-4 py-2.5;
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-primary/10 text-primary px-4 py-2.5;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error hover:bg-error/90 text-white px-4 py-2.5 shadow-sm;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+  
+  /* Input Components */
+  .input {
+    @apply w-full px-4 py-3 border-2 border-gray200 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-fast;
+  }
+  
+  .input-error {
+    @apply border-error focus:ring-error focus:border-error;
+  }
+  
+  .input-success {
+    @apply border-success focus:ring-success focus:border-success;
+  }
+  
+  .label {
+    @apply block font-medium text-gray800 mb-1 text-sm;
+  }
+  
+  .helper-text {
+    @apply text-sm text-gray600 mt-1;
+  }
+  
+  .error-text {
+    @apply text-sm text-error mt-1 flex items-center gap-1;
+  }
+  
+  /* Badge Components */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .badge-success {
+    @apply bg-successLight text-success;
+  }
+  
+  .badge-warning {
+    @apply bg-warningLight text-warning;
+  }
+  
+  .badge-error {
+    @apply bg-errorLight text-error;
+  }
+  
+  .badge-info {
+    @apply bg-infoLight text-info;
+  }
+  
+  .badge-neutral {
+    @apply bg-gray100 text-gray800;
+  }
+  
+  /* Progress Bar */
+  .progress-track {
+    @apply w-full h-2 bg-gray200 rounded-full overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-primary rounded-full transition-all duration-slow;
+  }
+  
+  /* Modal Components */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6;
+  }
+  
+  .modal-container {
+    @apply bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto;
+  }
+  
+  .modal-header {
+    @apply border-b border-gray200 px-6 py-4 flex items-center justify-between;
+  }
+  
+  .modal-body {
+    @apply px-6 py-4;
+  }
+  
+  .modal-footer {
+    @apply border-t border-gray200 px-6 py-4 flex items-center justify-end gap-3;
+  }
+  
+  /* Notification Components */
+  .notification {
+    @apply flex items-start gap-3 p-4 rounded-lg border-l-4;
+  }
+  
+  .notification-success {
+    @apply bg-successLight border-l-success text-success;
+  }
+  
+  .notification-error {
+    @apply bg-errorLight border-l-error text-error;
+  }
+  
+  .notification-warning {
+    @apply bg-warningLight border-l-warning text-warning;
+  }
+  
+  .notification-info {
+    @apply bg-infoLight border-l-info text-info;
+  }
+}
+

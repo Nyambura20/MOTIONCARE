@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Signup Flow</title></head>
+<body>
+<script>
+// Check what's in localStorage
+console.log('=== LocalStorage Contents ===');
+for (let i = 0; i < localStorage.length; i++) {
+  const key = localStorage.key(i);
+  console.log(key + ':', localStorage.getItem(key));
+}
+
+// Clear assessment state
+console.log('\n=== Clearing assessment state ===');
+localStorage.removeItem('motioncare-assessment-state');
+
+console.log('\n=== After clearing ===');
+console.log('motioncare-assessment-state:', localStorage.getItem('motioncare-assessment-state'));
+</script>
+<p>Check console for localStorage contents</p>
+</body>
+</html>

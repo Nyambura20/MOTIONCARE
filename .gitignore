@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Vertex AI Credentials
+vertex-ai-key.json
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Build Output
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Firebase (if used)
+.firebase/
+.firebaserc
+
+# Testing
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
