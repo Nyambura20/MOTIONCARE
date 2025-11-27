@@ -91,6 +91,19 @@ MotionCare helps patients recovering from injury, surgery, or chronic mobility c
 
 5. Open http://localhost:5173
 
+## Deployment
+
+Deploy to Google Cloud Run for a live demo:
+
+```bash
+# Quick deployment
+./deploy.sh
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions, cost estimation, and troubleshooting.
+
+**Live Demo**: After deployment, your app will be available at `https://motioncare-xxxxx-uc.a.run.app`
+
 ## Genkit Flows
 
 See `GENKIT_VERTEX_AI_INTEGRATION.md` for comprehensive documentation on:

@@ -7,7 +7,7 @@ export async function analyzeInjuryImage(imageDataUrl) {
   try {
     console.log('Sending image to server for analysis...');
 
-    const response = await fetch('http://localhost:3001/api/analyze-image', {
+    const response = await fetch(`${API_URL}/api/analyze-image`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ export async function analyzeInjuryImage(imageDataUrl) {
  */
 export async function generateFocusImages(painLocation, injuryType) {
   try {
-    const response = await fetch('http://localhost:3001/api/generate-images', {
+    const response = await fetch(`${API_URL}/api/generate-images`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

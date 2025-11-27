@@ -45,7 +45,8 @@ export async function sendMessage(chatSession, message) {
       injuryContext: chatSession.injuryContext
     });
 
-    const resp = await fetch('http://localhost:3001/api/chat', {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const resp = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -101,7 +102,8 @@ export async function generateExercisePlan(chatSession, messages) {
 
     console.log('Sending plan request to server...')
 
-    const resp = await fetch('http://localhost:3001/api/generate-plan', {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const resp = await fetch(`${API_URL}/api/generate-plan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

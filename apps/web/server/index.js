@@ -28,6 +28,11 @@ app.use(express.json({ limit: '50mb' }));
 
 app.options('*', cors());
 
+// Serve static frontend files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '..', 'public')));
+}
+
 const auth = new GoogleAuth({
   keyFilename: path.join(__dirname, '..', 'vertex-ai-key.json'),
   scopes: ['https://www.googleapis.com/auth/cloud-platform']
@@ -339,6 +344,13 @@ app.post('/api/analyze-exercise-form', async (req, res) => {
     });
   }
 });
+
+// Serve frontend for all other routes in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  });
+}
 
 // Start server
 app.listen(PORT, () => {
