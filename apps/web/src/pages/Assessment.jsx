@@ -1463,7 +1463,7 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
   const thumbnailCanvasRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [poseDetector, setPoseDetector] = useState(null)
-  const [isLoadingPose, setIsLoadingPose] = useState(true)
+  const [isLoadingPose, setIsLoadingPose] = useState(false)
   const [showThumbnail, setShowThumbnail] = useState(true)
   const animationFrameRef = useRef(null)
 
@@ -1472,8 +1472,8 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       videoRef.current.load()
     }
     
-    // Load MediaPipe Pose
-    loadPoseDetector()
+    // DON'T auto-load MediaPipe for uploaded videos - only load when user clicks play
+    // This prevents the blocking "Initializing" popup
   }, [videoSrc])
 
   // DON'T auto-start for uploaded videos - let user click play button
@@ -1544,8 +1544,20 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     const video = videoRef.current
     const canvas = canvasRef.current
 
-    if (!video || !canvas || !poseDetector) {
-      console.warn(' Video, canvas, or pose detector not ready')
+    if (!video || !canvas) {
+      console.warn(' Video or canvas not ready')
+      return
+    }
+
+    // Load pose detector if not already loaded
+    if (!poseDetector) {
+      console.log(' Loading pose detector for video playback...')
+      await loadPoseDetector()
+    }
+
+    // Check again after loading
+    if (!poseDetector) {
+      console.warn(' Pose detector failed to load')
       return
     }
 
@@ -1702,12 +1714,12 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         />
       </div>
       
-      {(!poseDetector || isLoadingPose) && (
+      {(!poseDetector && isLoadingPose) && (
         <div className="absolute top-4 left-4 bg-yellow-500/80 px-3 py-2 rounded-lg">
           <div className="flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-white" />
             <span className="text-white text-sm font-medium">
-              {isLoadingPose ? 'Loading pose detector...' : 'Initializing...'}
+              Loading pose detector...
             </span>
           </div>
         </div>
@@ -1717,7 +1729,7 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         {!isPlaying ? (
           <button
             onClick={handlePlay}
-            disabled={!poseDetector || isLoadingPose}
+            disabled={isLoadingPose}
             className="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Play className="w-5 h-5" />

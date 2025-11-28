@@ -19,7 +19,9 @@ COPY apps/web/vite.config.js ./apps/web/
 COPY apps/web/tailwind.config.cjs ./apps/web/
 COPY apps/web/postcss.config.cjs ./apps/web/
 
-# Build frontend
+# Build frontend with production API URL (empty = same domain)
+ARG VITE_API_URL=""
+ENV VITE_API_URL=$VITE_API_URL
 RUN cd apps/web && npm run build
 
 # Stage 2: Production Backend + Serve Frontend

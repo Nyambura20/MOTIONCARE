@@ -1,4 +1,8 @@
-/**init 
+// In production (Cloud Run), use empty string for same-domain API calls
+// In development, use localhost:3001
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3001');
+
+/**
  * Analyze injury photo using Genkit + Vertex AI Vision.
  * @param {string} imageDataUrl - Base64 data URL of the injury image
  * @returns {Promise<Object>} Analysis with painLocation, injuryType, severity, and recommendations

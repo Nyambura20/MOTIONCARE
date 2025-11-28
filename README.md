@@ -91,7 +91,18 @@ MotionCare helps patients recovering from injury, surgery, or chronic mobility c
 
 5. Open http://localhost:5173
 
+## Project Deliverables
+
+📁 **[Complete Project Documentation](https://drive.google.com/drive/folders/1qBMcyJ0FxlW9okCx66wSNtU9Q-3ItVv6?usp=drive_link)**
+
+This Google Drive folder contains:
+- 📄 **Project Proposal** - Comprehensive 15-page project documentation
+- 🎯 **Presentation Slides** - 17-slide technical presentation 
+- 🎥 **Demo Video** - Short demonstration of all features
+
 ## Deployment
+
+**Live Application**: https://motioncare-wlu2xorg3a-uc.a.run.app
 
 Deploy to Google Cloud Run for a live demo:
 
@@ -99,8 +110,6 @@ Deploy to Google Cloud Run for a live demo:
 # Quick deployment
 ./deploy.sh
 ```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions, cost estimation, and troubleshooting.
 
 **Live Demo**: After deployment, your app will be available at `https://motioncare-xxxxx-uc.a.run.app`
 

@@ -267,7 +267,7 @@ export const generateExercisePlanFlow = ai.defineFlow(
           name: z.string(),
           sets: z.number(),
           reps: z.number(),
-          duration: z.string().optional(),
+          duration: z.string().nullable().optional(),
           instructions: z.string(),
           focusPoints: z.array(z.string()),
           safetyTips: z.array(z.string()),
@@ -304,7 +304,7 @@ IMPORTANT: Return ONLY valid JSON with this structure:
           "name": "Exercise name",
           "sets": 3,
           "reps": 10,
-          "duration": "30 seconds",
+          "duration": "30 seconds (optional - use for holds/stretches, omit or set null for reps-based exercises)",
           "instructions": "Clear step-by-step instructions",
           "focusPoints": ["Key focus point 1", "Key focus point 2"],
           "safetyTips": ["Safety tip 1", "Safety tip 2"]

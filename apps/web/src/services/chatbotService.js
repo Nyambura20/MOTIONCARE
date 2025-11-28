@@ -45,7 +45,7 @@ export async function sendMessage(chatSession, message) {
       injuryContext: chatSession.injuryContext
     });
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3001');
     const resp = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,7 +102,7 @@ export async function generateExercisePlan(chatSession, messages) {
 
     console.log('Sending plan request to server...')
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3001');
     const resp = await fetch(`${API_URL}/api/generate-plan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
