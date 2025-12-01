@@ -794,10 +794,14 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
   const handlePoseLandmarksUpdate = (landmarks) => {
     setPoseLandmarks(landmarks)
     if (landmarks) {
-      setPoseLandmarksHistory(prev => [...prev, {
-        timestamp: Date.now(),
-        landmarks: landmarks
-      }])
+      setPoseLandmarksHistory(prev => {
+        const updated = [...prev, {
+          timestamp: Date.now(),
+          landmarks: landmarks
+        }]
+        console.log(' Pose history updated - Total frames:', updated.length)
+        return updated
+      })
     }
   }
   
@@ -1182,21 +1186,38 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
             </div>
           </div>
 
-          {/* Get AI Feedback Button - Shows when pose data is collected */}
-          {poseLandmarksHistory.length > 10 && (
-            <div className="mt-6">
-              <button
-                onClick={handleFinishExercise}
-                className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:via-teal-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3"
-              >
-                <CheckCircle2 className="w-6 h-6" />
-                Get AI Feedback on Your Form
-              </button>
-              <p className="text-center text-gray-400 text-sm mt-3">
-                ✅ {poseLandmarksHistory.length} frames analyzed! Click to get detailed feedback.
+          {/* Stats and Analysis Button */}
+          <div className="mt-6 space-y-4">
+            {/* Show frames captured indicator */}
+            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700\">
+              <div className=\"flex items-center justify-between mb-2\">
+                <span className=\"text-sm text-gray-400\">Frames Captured</span>
+                <span className=\"text-lg font-bold text-white\">{poseLandmarksHistory.length}</span>
+              </div>
+              <div className=\"w-full bg-gray-700 rounded-full h-2\">
+                <div 
+                  className=\"bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-300\"
+                  style={{ width: `${Math.min((poseLandmarksHistory.length / 30) * 100, 100)}%` }}
+                ></div>
+              </div>
+              <p className=\"text-xs text-gray-500 mt-2\">
+                {poseLandmarksHistory.length < 10 
+                  ? `Need ${10 - poseLandmarksHistory.length} more frames to analyze` 
+                  : '✅ Ready for AI analysis!'}
               </p>
             </div>
-          )}
+
+            {/* Get AI Feedback Button - Shows when pose data is collected */}
+            {poseLandmarksHistory.length > 10 && (
+              <button
+                onClick={handleFinishExercise}
+                className=\"w-full px-6 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:via-teal-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3 animate-pulse\"
+              >
+                <CheckCircle2 className=\"w-6 h-6\" />
+                Get AI Feedback on Your Form
+              </button>
+            )}
+          </div>"
         </div>
       )}
     </div>
@@ -1520,9 +1541,9 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     const ctx = canvas.getContext('2d')
     if (!ctx || !results) return
     
-    // Update skeleton component with pose landmarks
+    // Update skeleton component with pose landmarks AND add to history
     if (results.poseLandmarks) {
-      setPoseLandmarks(results.poseLandmarks)
+      setPoseLandmarks(results.poseLandmarks) // This calls handlePoseLandmarksUpdate which adds to history
       console.log(' Pose detected with', results.poseLandmarks.length, 'landmarks')
     } else {
       console.log(' No pose detected in frame')
@@ -1694,19 +1715,22 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       
       {/* Thumbnail - show immediately. If pose detector is loading, show a small, non-blocking badge. */}
       {showThumbnail && (
-        <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center cursor-pointer" style={{ minHeight: '400px' }} onClick={handlePlay}>
+        <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center cursor-pointer group" style={{ minHeight: '400px' }} onClick={handlePlay}>
           <canvas
             ref={thumbnailCanvasRef}
             className="w-full h-auto"
           />
           {/* Play Button Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-all">
-            <div className="bg-white/90 hover:bg-white rounded-full p-6 transition-all transform hover:scale-110">
-              <Play className="w-12 h-12 text-gray-900" fill="currentColor" />
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black/50 via-black/40 to-black/50 group-hover:from-black/40 group-hover:via-black/30 group-hover:to-black/40 transition-all duration-300">
+            <div className="relative">
+              <div className="absolute inset-0 bg-white rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+              <div className="relative bg-white rounded-full p-8 shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                <Play className="w-16 h-16 text-gray-900" fill="currentColor" />
+              </div>
             </div>
           </div>
           {isLoadingPose && (
-            <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 rounded-lg flex items-center gap-2">
+            <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 rounded-lg flex items-center gap-2 backdrop-blur-sm">
               <Loader2 className="w-5 h-5 text-primary animate-spin" />
               <span className="text-white text-sm">Loading AI...</span>
             </div>
