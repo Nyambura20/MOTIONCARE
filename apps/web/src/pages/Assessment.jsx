@@ -1694,11 +1694,17 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       
       {/* Thumbnail - show immediately. If pose detector is loading, show a small, non-blocking badge. */}
       {showThumbnail && (
-        <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center" style={{ minHeight: '400px' }}>
+        <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center cursor-pointer" style={{ minHeight: '400px' }} onClick={handlePlay}>
           <canvas
             ref={thumbnailCanvasRef}
             className="w-full h-auto"
           />
+          {/* Play Button Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-all">
+            <div className="bg-white/90 hover:bg-white rounded-full p-6 transition-all transform hover:scale-110">
+              <Play className="w-12 h-12 text-gray-900" fill="currentColor" />
+            </div>
+          </div>
           {isLoadingPose && (
             <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 rounded-lg flex items-center gap-2">
               <Loader2 className="w-5 h-5 text-primary animate-spin" />

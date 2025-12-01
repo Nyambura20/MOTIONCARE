@@ -51,3 +51,4 @@ coverage/
 .cache/
 .parcel-cache/
 .eslintcache
+deploy-output.log

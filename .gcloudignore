@@ -1,0 +1,21 @@
+# .gcloudignore - Files to exclude from Cloud Build uploads
+.git
+.gitignore
+node_modules/
+.env
+.env.local
+README.md
+.vscode
+.idea
+dist
+build
+coverage
+.DS_Store
+*.log
+.firebase
+docs/
+demo/
+deploy-output.log
+
+# IMPORTANT: Include vertex-ai-key.json for deployment
+!apps/web/vertex-ai-key.json
