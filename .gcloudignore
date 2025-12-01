@@ -19,3 +19,4 @@ deploy-output.log
 
 # IMPORTANT: Include vertex-ai-key.json for deployment
 !apps/web/vertex-ai-key.json
+deploy-output.log
