@@ -1471,9 +1471,9 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     if (videoRef.current) {
       videoRef.current.load()
     }
-    
-    // DON'T auto-load MediaPipe for uploaded videos - only load when user clicks play
-    // This prevents the blocking "Initializing" popup
+    // Reset states when new video is uploaded
+    setShowThumbnail(true)
+    setIsPlaying(false)
   }, [videoSrc])
 
   // DON'T auto-start for uploaded videos - let user click play button
@@ -1502,9 +1502,8 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       
       pose.onResults(onPoseResults)
       
-      // Wait a bit for WASM to initialize
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      // Allow WASM and resources to initialize but do not block playback.
+      // Keep the flag while loading so UI can show a small indicator.
       setPoseDetector(pose)
       setIsLoadingPose(false)
     } catch (error) {
@@ -1549,19 +1548,14 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       return
     }
 
-    // Load pose detector if not already loaded
-    if (!poseDetector) {
-      console.log(' Loading pose detector for video playback...')
-      await loadPoseDetector()
+    // Start loading pose detector in background if not already loaded
+    if (!poseDetector && !isLoadingPose) {
+      console.log('Loading pose detector in background for video playback...')
+      // don't await - let video start immediately
+      loadPoseDetector().catch((e) => console.error('Background pose load failed', e))
     }
 
-    // Check again after loading
-    if (!poseDetector) {
-      console.warn(' Pose detector failed to load')
-      return
-    }
-
-    // Wait for video metadata to load
+    // Wait for video metadata to load (so we can size canvas)
     if (video.readyState < 2) {
       await new Promise((resolve) => {
         video.onloadedmetadata = resolve
@@ -1580,7 +1574,7 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     video.play()
     setIsPlaying(true)
     
-    // Start pose detection loop
+    // Start pose rendering loop (will perform pose detection when detector is ready)
     detectPoseInVideo()
   }
 
@@ -1588,8 +1582,8 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     const video = videoRef.current
     const canvas = canvasRef.current
     
-    if (!video || !poseDetector || !canvas) {
-      console.warn('Video, canvas, or pose detector not ready')
+    if (!video || !canvas) {
+      console.warn('Video or canvas not ready')
       return
     }
 
@@ -1600,26 +1594,33 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         setIsPlaying(false)
         return
       }
-      
+
       if (video.readyState >= 2) {
         try {
-          // First draw the video frame manually as fallback
+          // Always draw the video frame so playback is smooth even if pose isn't ready
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-          
-          // Then try pose detection (will redraw with skeleton if successful)
-          await poseDetector.send({ image: video })
+
+          // If pose detector is ready, run detection (non-blocking)
+          if (poseDetector) {
+            try {
+              await poseDetector.send({ image: video })
+            } catch (err) {
+              // Log but don't interrupt playback
+              console.debug('Pose detector frame error:', err)
+            }
+          }
         } catch (error) {
           console.error('Error processing frame:', error)
-          // Even if pose detection fails, keep showing video
+          // Ensure video still displays
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
         }
       }
-      
+
       animationFrameRef.current = requestAnimationFrame(processFrame)
     }
-    
+
     processFrame()
   }
 
@@ -1691,18 +1692,19 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         preload="metadata"
       />
       
-      {/* Loading state while pose detector initializes */}
-      {showThumbnail && isLoadingPose && (
+      {/* Thumbnail - show immediately. If pose detector is loading, show a small, non-blocking badge. */}
+      {showThumbnail && (
         <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center" style={{ minHeight: '400px' }}>
           <canvas
             ref={thumbnailCanvasRef}
             className="w-full h-auto"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mb-3" />
-            <p className="text-white font-semibold">Initializing AI Analysis...</p>
-            <p className="text-gray-400 text-sm mt-1">Please wait</p>
-          </div>
+          {isLoadingPose && (
+            <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 rounded-lg flex items-center gap-2">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <span className="text-white text-sm">Loading AI...</span>
+            </div>
+          )}
         </div>
       )}
       
@@ -1714,12 +1716,22 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         />
       </div>
       
-      {(!poseDetector && isLoadingPose) && (
-        <div className="absolute top-4 left-4 bg-yellow-500/80 px-3 py-2 rounded-lg">
+      {isLoadingPose && !poseDetector && isPlaying && (
+        <div className="absolute top-4 left-4 bg-blue-500/90 px-3 py-2 rounded-lg backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-white" />
             <span className="text-white text-sm font-medium">
-              Loading pose detector...
+              Loading AI detection...
+            </span>
+          </div>
+        </div>
+      )}
+      {poseDetector && isPlaying && (
+        <div className="absolute top-4 left-4 bg-green-500/90 px-3 py-2 rounded-lg backdrop-blur-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            <span className="text-white text-sm font-medium">
+              AI Pose Detection Active
             </span>
           </div>
         </div>
@@ -1729,11 +1741,10 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         {!isPlaying ? (
           <button
             onClick={handlePlay}
-            disabled={isLoadingPose}
-            className="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold inline-flex items-center justify-center gap-2"
           >
             <Play className="w-5 h-5" />
-            {isLoadingPose ? 'Loading...' : 'Play with Pose Detection'}
+            {isLoadingPose ? 'Play (AI loading)' : 'Play with Pose Detection'}
           </button>
         ) : (
           <button
