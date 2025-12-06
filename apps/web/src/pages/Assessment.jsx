@@ -1132,13 +1132,26 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       setIsPoseReady(false)
       console.log('🚀 Loading MediaPipe Pose...')
       
-      const { Pose } = await import('@mediapipe/pose')
+      // Wait for MediaPipe to be available globally
+      let attempts = 0
+      while (!window.Pose && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+        attempts++
+      }
       
-      const pose = new Pose({
+      if (!window.Pose) {
+        throw new Error('MediaPipe Pose not loaded. Please refresh the page.')
+      }
+      
+      console.log('📦 MediaPipe Pose available globally, creating instance...')
+      
+      const pose = new window.Pose({
         locateFile: (file) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/${file}`
         }
       })
+      
+      console.log('✅ Pose instance created')
       
       // Set up the onResults callback BEFORE setting options
       pose.onResults(onPoseResults)
@@ -1153,13 +1166,14 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         minTrackingConfidence: 0.5
       })
       
+      console.log('⚙️ Pose options configured')
+      
       // Store the detector but don't mark as ready yet
       setPoseDetector(pose)
       
-      // Wait for WASM to fully initialize by doing a test send
-      // This ensures the module is ready before actual use
+      // Wait for WASM to fully initialize
       console.log('⏳ Initializing WASM module...')
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       
       // Mark as ready
       setIsPoseReady(true)
