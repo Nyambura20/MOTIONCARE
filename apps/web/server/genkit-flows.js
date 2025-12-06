@@ -266,7 +266,7 @@ export const generateExercisePlanFlow = ai.defineFlow(
         exercises: z.array(z.object({
           name: z.string(),
           sets: z.number(),
-          reps: z.number(),
+          reps: z.number().nullable().optional(),
           duration: z.string().nullable().optional(),
           instructions: z.string(),
           focusPoints: z.array(z.string()),
@@ -465,44 +465,66 @@ export const analyzeExerciseFormWithPoseFlow = ai.defineFlow(
 - Total Frames Captured: ${poseMetrics.frames}
 - Exercise Duration: ${poseMetrics.duration} seconds
 - Average Landmark Visibility: ${poseMetrics.avgVisibility}%
+- Body Stability Score: ${poseMetrics.bodyStability || 'N/A'}
 
 **JOINT ANGLE MEASUREMENTS (degrees):**
-${poseMetrics.wristRange ? `- Wrist Angles: ${poseMetrics.wristRange.min.toFixed(1)}° → ${poseMetrics.wristRange.max.toFixed(1)}° (avg ${poseMetrics.wristRange.avg.toFixed(1)}°, movement amplitude ${poseMetrics.wristMovement}°)` : ''}
-${poseMetrics.elbowRange ? `- Elbow Angles: ${poseMetrics.elbowRange.min.toFixed(1)}° → ${poseMetrics.elbowRange.max.toFixed(1)}° (avg ${poseMetrics.elbowRange.avg.toFixed(1)}°, movement amplitude ${poseMetrics.elbowMovement}°)` : ''}
-${poseMetrics.kneeRange ? `- Knee Angles: ${poseMetrics.kneeRange.min.toFixed(1)}° → ${poseMetrics.kneeRange.max.toFixed(1)}° (avg ${poseMetrics.kneeRange.avg.toFixed(1)}°, movement amplitude ${poseMetrics.kneeMovement}°)` : ''}
-${poseMetrics.ankleRange ? `- Ankle Angles: ${poseMetrics.ankleRange.min.toFixed(1)}° → ${poseMetrics.ankleRange.max.toFixed(1)}° (avg ${poseMetrics.ankleRange.avg.toFixed(1)}°, movement amplitude ${poseMetrics.ankleMovement}°)` : ''}
-${poseMetrics.hipMovement ? `- Hip Movement: ${poseMetrics.hipMovement}° range` : ''}
+${poseMetrics.wristRange ? `- Wrist Angles: ${poseMetrics.wristRange.min.toFixed(1)}° → ${poseMetrics.wristRange.max.toFixed(1)}° (avg ${poseMetrics.wristRange.avg.toFixed(1)}°, total movement ${poseMetrics.wristMovement})` : ''}
+${poseMetrics.elbowRange ? `- Elbow Angles: ${poseMetrics.elbowRange.min.toFixed(1)}° → ${poseMetrics.elbowRange.max.toFixed(1)}° (avg ${poseMetrics.elbowRange.avg.toFixed(1)}°, total movement ${poseMetrics.elbowMovement})` : ''}
+${poseMetrics.kneeRange ? `- Knee Angles: ${poseMetrics.kneeRange.min.toFixed(1)}° → ${poseMetrics.kneeRange.max.toFixed(1)}° (avg ${poseMetrics.kneeRange.avg.toFixed(1)}°, total movement ${poseMetrics.kneeMovement})` : ''}
+${poseMetrics.ankleRange ? `- Ankle Angles: ${poseMetrics.ankleRange.min.toFixed(1)}° → ${poseMetrics.ankleRange.max.toFixed(1)}° (avg ${poseMetrics.ankleRange.avg.toFixed(1)}°, total movement ${poseMetrics.ankleMovement})` : ''}
+${poseMetrics.hipRange ? `- Hip Angles: ${poseMetrics.hipRange.min.toFixed(1)}° → ${poseMetrics.hipRange.max.toFixed(1)}° (avg ${poseMetrics.hipRange.avg.toFixed(1)}°)` : ''}
+${poseMetrics.shoulderMovement ? `- Shoulder Movement: ${poseMetrics.shoulderMovement}` : ''}
 
-**CRITICAL INSTRUCTIONS:**
-1. **ONLY reference joint measurements that are RELEVANT to the injury location** (${injuryAnalysis?.painLocation || 'affected area'})
-2. If the injury is in the wrist/hand, focus ONLY on wrist angles and arm movements
-3. If the injury is in the knee/leg, focus ONLY on knee and ankle angles
-4. Do NOT mention unrelated joints (e.g., don't discuss knee angles for a wrist injury)
-5. Analyze if the movement amplitude is appropriate for this specific injury type
-6. Check if the exercise matches what was prescribed
-7. Provide injury-specific safety observations
+**CRITICAL ANALYSIS REQUIREMENTS:**
+1. **CITE SPECIFIC NUMBERS** from the joint measurements above - don't give generic feedback!
+2. **ONLY analyze joints RELEVANT to "${injuryAnalysis?.painLocation || 'the injury'}"**:
+   - Wrist/Hand injury → Analyze wrist angles, elbow angles, shoulder movement
+   - Knee/Leg injury → Analyze knee angles, ankle angles, hip angles
+   - Shoulder injury → Analyze shoulder movement, elbow angles
+   - DO NOT mention irrelevant joints (e.g., don't discuss knees for a wrist injury)
+3. **Compare measurements to ideal ranges** for the prescribed exercise:
+   - Is the range of motion too limited or excessive?
+   - Are the angles appropriate for the injury's healing stage?
+   - Is the movement smooth (look at min/max/avg consistency)?
+4. **Assess movement quality** from the data:
+   - Low visibility (<70%) = patient partially off-camera or poor lighting
+   - High body stability score = excessive swaying/compensation
+   - Duration too short/long for prescribed reps
+5. **Determine if they did the CORRECT exercise** based on movement pattern
+6. **Score varies based on actual data** - don't always give 75-85 points!
+   - Excellent form with ideal angles = 90-100
+   - Good form with minor issues = 75-89
+   - Moderate issues = 60-74
+   - Significant problems = 40-59
+   - Very poor form or wrong exercise = 0-39
+
+**EXAMPLE RESPONSES (use actual data, not these generic examples):**
+- "Your elbow extended from 45° to 165° (120° range), which is excellent for this wrist extension exercise"
+- "Knee flexion only reached 95° at maximum, should be closer to 120° for proper squat depth"
+- "Body stability score of 0.0234 indicates significant swaying - engage your core more"
+- "Visibility averaged only 62%, ensure your full body is visible in the camera frame"
 
 Return ONLY valid JSON with this structure:
 {
-  "overallScore": 85,
+  "overallScore": <number 0-100, based on actual performance data>,
   "exercisePerformed": "Name of exercise detected from movement pattern",
-  "wasCorrectExercise": true,
-  "strengths": ["What they did well - be specific about joint angles"],
-  "improvements": ["What to work on - specific to injured body part only"],
-  "safetyChecks": ["Safety observations relevant to the injury"],
-  "formAnalysis": "Technical analysis of movement quality for the injured area",
-  "specificFeedback": "Detailed feedback about the affected joint's performance",
-  "encouragement": "Positive, motivating message",
-  "nextSteps": "Specific actions for next session targeting the injury"
+  "wasCorrectExercise": <true if movement matches prescription>,
+  "strengths": ["Cite specific measurements showing good form", "Reference actual angle values"],
+  "improvements": ["Cite specific measurements showing issues", "Use exact numbers from data"],
+  "safetyChecks": ["Flag any dangerous movements based on injury context"],
+  "formAnalysis": "Technical analysis citing specific joint angles and comparing to exercise requirements",
+  "specificFeedback": "Detailed feedback using the EXACT measurement values from the affected joints only",
+  "encouragement": "Positive message acknowledging their specific achievements",
+  "nextSteps": "Concrete actions based on the numerical data (e.g., 'increase knee flexion by 15°')"
 }
 
-Score 0-100 based on: form quality (40%), safety (30%), movement amplitude (20%), consistency (10%)`;
+Score breakdown: form quality (40%), safety (30%), movement amplitude (20%), consistency (10%)`;
 
     const llmResponse = await ai.generate({
       model: 'vertexai/gemini-2.0-flash-exp',
       prompt,
       config: {
-        temperature: 0.5,
+        temperature: 0.8, // Increased for more varied, personalized feedback
         maxOutputTokens: 1500,
       },
     });

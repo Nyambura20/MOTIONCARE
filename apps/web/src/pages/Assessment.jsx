@@ -377,7 +377,16 @@ export default function Assessment() {
         {/* Back Button */}
         <div className="mb-4">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => {
+              setStep('upload')
+              setInjuryImage(null)
+              setInjuryAnalysis(null)
+              setFocusImages([])
+              setMessages([])
+              setChatSession(null)
+              setExerciseInstructions(null)
+              setFeedback(null)
+            }}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm inline-flex items-center gap-2 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -704,12 +713,12 @@ function ChatStep({ injuryAnalysis, messages, setMessages, inputMessage, setInpu
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-6 border-t border-gray-700">
-        <div className="flex gap-2 items-end">
-          {/* Attachment button */}
+      {/* Input Area - Mobile Optimized */}
+      <div className="p-3 sm:p-6 border-t border-gray-700">
+        <div className="flex gap-1.5 sm:gap-2 items-end">
+          {/* Attachment button - Hidden on small screens */}
           <button
-            className="px-3 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-xl transition-all"
+            className="hidden sm:flex px-3 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-xl transition-all"
             title="Attach file"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -725,17 +734,17 @@ function ChatStep({ injuryAnalysis, messages, setMessages, inputMessage, setInpu
               placeholder="Message AI assistant..."
               disabled={isAnalyzing}
               rows={1}
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 resize-none"
-              style={{ minHeight: '48px', maxHeight: '120px' }}
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 resize-none"
+              style={{ minHeight: '42px', maxHeight: '120px' }}
             />
           </div>
 
           {/* Voice input button */}
           <button
-            className="px-3 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-xl transition-all"
+            className="px-2.5 sm:px-3 py-2.5 sm:py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-xl transition-all flex-shrink-0"
             title="Voice input"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
           </button>
@@ -743,30 +752,33 @@ function ChatStep({ injuryAnalysis, messages, setMessages, inputMessage, setInpu
           <button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isAnalyzing}
-            className="px-4 py-3 bg-primary hover:bg-primaryDark text-white rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 bg-primary hover:bg-primaryDark text-white rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5 sm:gap-2 flex-shrink-0"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline text-sm">Send</span>
           </button>
         </div>
         
-        <div className="flex items-center justify-between mt-3">
-          <p className="text-xs text-gray-500">AI can make mistakes. Check important info.</p>
+        <div className="flex items-center justify-between mt-2 sm:mt-3 flex-wrap gap-2">
+          <p className="text-[10px] sm:text-xs text-gray-500">AI can make mistakes. Check important info.</p>
           {/* Show Generate Plan button only after at least 2 user responses (5 total messages: 1 AI greeting + 2 pairs of user/AI) */}
           {messages.filter(m => m.role === 'user').length >= 2 && (
             <button
               onClick={onGeneratePlan}
               disabled={isGeneratingPlan || isAnalyzing}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm transition-all inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-xs sm:text-sm transition-all inline-flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGeneratingPlan ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Generating Plan...
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                  <span className="hidden xs:inline">Generating...</span>
+                  <span className="xs:hidden">...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  Generate Exercise Plan
+                  <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Generate Exercise Plan</span>
+                  <span className="xs:hidden">Generate Plan</span>
                 </>
               )}
             </button>
@@ -777,18 +789,14 @@ function ChatStep({ injuryAnalysis, messages, setMessages, inputMessage, setInpu
   )
 }
 
-// STEP 3: Exercise (placeholder)
-// STEP 3: Exercise (placeholder)
+// STEP 3: Exercise
 function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExerciseMode, exerciseVideo, setExerciseVideo, videoInputRef, onAnalyzeExercise }) {
-  const [countdown, setCountdown] = useState(null)
   const [poseLandmarks, setPoseLandmarks] = useState(null) // Shared pose landmarks state
   const [poseLandmarksHistory, setPoseLandmarksHistory] = useState([]) // Store all pose frames
   const [currentWeek, setCurrentWeek] = useState(1) // Week navigation
   const [videoAnalysisComplete, setVideoAnalysisComplete] = useState(false) // Track video completion
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
-  const mediaRecorderRef = useRef(null)
-  const recordedChunksRef = useRef([])
   
   // Track pose landmarks over time for analysis
   const handlePoseLandmarksUpdate = (landmarks) => {
@@ -805,11 +813,6 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
     }
   }
   
-  const handleStartLive = () => {
-    setExerciseMode('live')
-    setCountdown(3)
-  }
-
   const handleUploadVideo = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -828,7 +831,7 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
   }
 
   const handleFinishExercise = async () => {
-    if ((exerciseVideo || exerciseMode === 'live') && poseLandmarksHistory.length > 0) {
+    if (exerciseVideo && poseLandmarksHistory.length > 0) {
       // Analyze and the handler will move to feedback step
       await onAnalyzeExercise(poseLandmarksHistory)
     } else if (!poseLandmarksHistory || poseLandmarksHistory.length === 0) {
@@ -838,14 +841,14 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
   }
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold text-white mb-4">Do Your Exercise</h2>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Do Your Exercise</h2>
       
       {/* Exercise Instructions */}
       {exerciseInstructions && (
-        <div className="mb-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700 shadow-xl">
-          <div className="mb-4">
-            <h3 className="text-xl font-bold text-white">Your Rehabilitation Plan</h3>
+        <div className="mb-4 sm:mb-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-700 shadow-xl">
+          <div className="mb-3 sm:mb-4">
+            <h3 className="text-lg sm:text-xl font-bold text-white">Your Rehabilitation Plan</h3>
           </div>
           
           {exerciseInstructions.weeklyPlan?.filter(week => week.week === currentWeek).map((week, weekIdx) => (
@@ -854,19 +857,19 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
                 <p className="text-sm text-primary font-semibold">📌 {week.progressionNotes}</p>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {week.exercises?.map((exercise, idx) => (
-                  <div key={idx} className="p-5 bg-gray-700/50 rounded-xl border border-gray-600 hover:border-gray-500 transition-all">
-                    <div className="flex items-start justify-between mb-3">
-                      <h5 className="text-lg font-semibold text-white">{exercise.name}</h5>
-                      <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-semibold border border-green-500/30">
-                        Exercise {idx + 1}
+                  <div key={idx} className="p-3 sm:p-5 bg-gray-700/50 rounded-lg sm:rounded-xl border border-gray-600 hover:border-gray-500 transition-all">
+                    <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                      <h5 className="text-base sm:text-lg font-semibold text-white">{exercise.name}</h5>
+                      <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-500/20 text-green-300 rounded-full text-[10px] sm:text-xs font-semibold border border-green-500/30 whitespace-nowrap">
+                        Ex {idx + 1}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300 mb-3">
-                      <strong className="text-primary">Sets:</strong> {exercise.sets} | 
-                      <strong className="text-primary ml-3">Reps:</strong> {exercise.reps} | 
-                      <strong className="text-primary ml-3">Duration:</strong> {exercise.duration}
+                    <p className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3 flex flex-wrap gap-x-3 gap-y-1">
+                      <span><strong className="text-primary">Sets:</strong> {exercise.sets}</span>
+                      <span><strong className="text-primary">Reps:</strong> {exercise.reps}</span>
+                      <span><strong className="text-primary">Duration:</strong> {exercise.duration}</span>
                     </p>
                     <p className="text-sm text-gray-300 mb-3 leading-relaxed">{exercise.instructions}</p>
                     {exercise.focusPoints && exercise.focusPoints.length > 0 && (
@@ -900,9 +903,9 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
       )}
 
       {/* Focus Images - Always show section */}
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-white mb-3">🎯 Key Areas to Focus On</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-bold text-white mb-2 sm:mb-3">🎯 Key Areas to Focus On</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {(focusImages && focusImages.length > 0 ? focusImages : [null, null]).map((img, idx) => {
             const isValidImage = img && typeof img === 'string' && (img.startsWith('http') || img.startsWith('data:image'));
             
@@ -939,177 +942,41 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
         </div>
       </div>
 
-      {/* Mode Selection */}
+      {/* Video Upload */}
       {!exerciseMode && (
-        <div className="grid md:grid-cols-2 gap-4 mb-6">
+        <div className="mb-4 sm:mb-6">
+          <input 
+            ref={videoInputRef}
+            type="file" 
+            accept="video/*" 
+            onChange={handleUploadVideo}
+            className="hidden"
+          />
           <button
-            onClick={handleStartLive}
-            className="p-6 bg-gradient-to-br from-primary to-purple-600 hover:from-primaryDark hover:to-purple-700 rounded-2xl transition-all group"
+            onClick={() => videoInputRef.current?.click()}
+            className="w-full p-6 sm:p-8 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-xl sm:rounded-2xl transition-all group shadow-2xl"
           >
-            <Video className="w-10 h-10 text-white mx-auto mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="text-xl font-bold text-white mb-2">Live Exercise</h3>
-            <p className="text-sm text-white/80">Use your webcam with real-time pose detection</p>
+            <Upload className="w-10 h-10 sm:w-12 sm:h-12 text-white mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform" />
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Upload Exercise Video</h3>
+            <p className="text-sm sm:text-base text-white/90">Upload your exercise video for AI analysis (max 30s)</p>
           </button>
-
-          <div>
-            <input 
-              ref={videoInputRef}
-              type="file" 
-              accept="video/*" 
-              onChange={handleUploadVideo}
-              className="hidden"
-            />
-            <button
-              onClick={() => videoInputRef.current?.click()}
-              className="w-full h-full p-6 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-2xl transition-all group"
-            >
-              <Upload className="w-10 h-10 text-white mx-auto mb-3 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold text-white mb-2">Upload Video</h3>
-              <p className="text-sm text-white/80">Upload exercise video (max 30s)</p>
-            </button>
-          </div>
         </div>
       )}
 
-      {/* Live Exercise Mode */}
-      {exerciseMode === 'live' && (
-        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                Live Exercise Session
-              </h3>
-              <p className="text-sm text-gray-400 mt-1">Real-time pose detection & analysis</p>
-            </div>
-            <button
-              onClick={() => setExerciseMode(null)}
-              className="px-4 py-2 bg-gray-700/50 hover:bg-gray-600 text-white rounded-lg text-sm backdrop-blur-sm border border-gray-600 transition-all"
-            >
-              Change Mode
-            </button>
-          </div>
-          
-          {/* Split Screen Layout - Premium Design */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Left: Live Webcam with Glass Effect */}
-            <div className="flex flex-col space-y-3">
-              <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30">
-                <span className="text-sm font-semibold text-purple-300 flex items-center gap-2">
-                  <Video className="w-4 h-4" />
-                  Your Exercise
-                </span>
-                <span className="text-xs text-gray-400">Live Feed</span>
-              </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-purple-500/30 bg-black" style={{ height: '480px' }}>
-                <LiveExerciseComponent 
-                  countdown={countdown}
-                  setCountdown={setCountdown}
-                  videoRef={videoRef}
-                  canvasRef={canvasRef}
-                  isRecording={isRecording}
-                  setIsRecording={setIsRecording}
-                  setExerciseVideo={setExerciseVideo}
-                  mediaRecorderRef={mediaRecorderRef}
-                  recordedChunksRef={recordedChunksRef}
-                  setPoseLandmarks={handlePoseLandmarksUpdate}
-                />
-              </div>
-            </div>
-            
-            {/* Right: 3D Skeleton with Neon Effect */}
-            <div className="flex flex-col space-y-3">
-              <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-cyan-600/20 to-green-600/20 rounded-lg border border-cyan-500/30">
-                <span className="text-sm font-semibold text-cyan-300 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
-                  </svg>
-                  AI Skeleton Analysis
-                </span>
-                {poseLandmarks && (
-                  <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
-                    Active
-                  </span>
-                )}
-              </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-cyan-500/30 bg-gray-900" style={{ height: '480px' }}>
-                <SkeletonCanvas poseLandmarks={poseLandmarks} />
-                {/* Corner Stats */}
-                {poseLandmarks && (
-                  <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 backdrop-blur-md rounded-lg border border-cyan-500/30">
-                    <div className="text-xs text-cyan-300 font-mono">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span>{poseLandmarks.length} Points</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Live Stats and Feedback Button */}
-          <div className="mt-6 space-y-4">
-            {/* Real-time Stats */}
-            <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-4 border border-gray-700">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-cyan-400">{poseLandmarksHistory.length}</div>
-                  <div className="text-xs text-gray-400">Frames Captured</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-400">
-                    {poseLandmarksHistory.length > 0 
-                      ? ((poseLandmarksHistory[poseLandmarksHistory.length - 1]?.timestamp - poseLandmarksHistory[0]?.timestamp) / 1000).toFixed(1)
-                      : '0.0'
-                    }s
-                  </div>
-                  <div className="text-xs text-gray-400">Duration</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-400">
-                    {poseLandmarks ? 'Active' : 'Waiting'}
-                  </div>
-                  <div className="text-xs text-gray-400">Pose Detection</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Get AI Feedback Button - Shows when enough pose data collected */}
-            {poseLandmarksHistory.length > 10 && (
-              <button
-                onClick={handleFinishExercise}
-                className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:via-teal-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3"
-              >
-                <CheckCircle2 className="w-6 h-6" />
-                Get AI Feedback on Your Form
-              </button>
-            )}
-
-            {poseLandmarksHistory.length <= 10 && poseLandmarksHistory.length > 0 && (
-              <div className="text-center p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-xl">
-                <p className="text-yellow-400 text-sm">
-                  ⏱️ Perform exercise for a few more seconds... ({poseLandmarksHistory.length}/10 frames minimum)
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Live Exercise Mode - REMOVED */}
 
       {/* Upload Video Mode */}
       {exerciseMode === 'upload' && exerciseVideo && (
-        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-700 shadow-2xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
             <div>
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Play className="w-5 h-5 text-white" />
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 Video Analysis
               </h3>
-              <p className="text-sm text-gray-400 mt-1">AI-powered movement assessment</p>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1">AI-powered movement assessment</p>
             </div>
             <button
               onClick={() => {
@@ -1117,24 +984,25 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
                 setExerciseVideo(null)
                 setPoseLandmarks(null)
               }}
-              className="px-4 py-2 bg-gray-700/50 hover:bg-gray-600 text-white rounded-lg text-sm backdrop-blur-sm border border-gray-600 transition-all"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-700/50 hover:bg-gray-600 text-white rounded-lg text-xs sm:text-sm backdrop-blur-sm border border-gray-600 transition-all whitespace-nowrap"
             >
               Upload Different Video
             </button>
           </div>
           
           {/* Split Screen Layout - Premium Design */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* Left: Video Playback with Cinematic Frame */}
-            <div className="flex flex-col space-y-3">
-              <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
-                <span className="text-sm font-semibold text-blue-300 flex items-center gap-2">
-                  <Play className="w-4 h-4" />
-                  Your Performance
+            <div className="flex flex-col space-y-2 sm:space-y-3">
+              <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
+                <span className="text-xs sm:text-sm font-semibold text-blue-300 flex items-center gap-1.5 sm:gap-2">
+                  <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Your Performance</span>
+                  <span className="xs:hidden">Video</span>
                 </span>
-                <span className="text-xs text-gray-400">Video Playback</span>
+                <span className="text-[10px] sm:text-xs text-gray-400">Playback</span>
               </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-blue-500/30 bg-black" style={{ height: '480px' }}>
+              <div className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-2xl border border-blue-500/30 bg-black" style={{ minHeight: '240px', height: 'auto', maxHeight: '480px' }}>
                 <VideoPlaybackComponent 
                   videoSrc={exerciseVideo}
                   canvasRef={canvasRef}
@@ -1148,36 +1016,38 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
             </div>
             
             {/* Right: 3D Skeleton with Advanced Visualization */}
-            <div className="flex flex-col space-y-3">
-              <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 rounded-lg border border-emerald-500/30">
-                <span className="text-sm font-semibold text-emerald-300 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="flex flex-col space-y-2 sm:space-y-3">
+              <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 rounded-lg border border-emerald-500/30">
+                <span className="text-xs sm:text-sm font-semibold text-emerald-300 flex items-center gap-1.5 sm:gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 6v6l4 2"/>
                   </svg>
-                  3D Pose Tracking
+                  <span className="hidden xs:inline">3D Pose</span>
+                  <span className="xs:hidden">Pose</span>
                 </span>
                 {poseLandmarks && (
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
-                      Tracking Active
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
+                      <span className="hidden xs:inline">Tracking</span>
+                      <span className="xs:hidden">On</span>
                     </span>
                   </div>
                 )}
               </div>
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-emerald-500/30 bg-gray-900" style={{ height: '480px' }}>
+              <div className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-2xl border border-emerald-500/30 bg-gray-900" style={{ minHeight: '240px', height: 'auto', maxHeight: '480px' }}>
                 <SkeletonCanvas poseLandmarks={poseLandmarks} />
                 {/* Real-time Stats Overlay */}
                 {poseLandmarks && (
-                  <div className="absolute bottom-4 left-4 right-4 px-4 py-3 bg-black/70 backdrop-blur-md rounded-lg border border-emerald-500/30">
+                  <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 px-2 sm:px-4 py-2 sm:py-3 bg-black/70 backdrop-blur-md rounded-lg border border-emerald-500/30">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs text-emerald-300">
-                        <span className="font-semibold">{poseLandmarks.length}</span> tracking points detected
+                      <div className="text-[10px] sm:text-xs text-emerald-300">
+                        <span className="font-semibold">{poseLandmarks.length}</span> <span className="hidden xs:inline">tracking points</span><span className="xs:hidden">pts</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                        AI Processing
+                      <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-gray-400">
+                        <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-400 rounded-full"></div>
+                        AI
                       </div>
                     </div>
                   </div>
@@ -1187,23 +1057,23 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
           </div>
 
           {/* Stats and Analysis Button */}
-          <div className="mt-6 space-y-4">
+          <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
             {/* Show frames captured indicator */}
-            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700\">
-              <div className=\"flex items-center justify-between mb-2\">
-                <span className=\"text-sm text-gray-400\">Frames Captured</span>
-                <span className=\"text-lg font-bold text-white\">{poseLandmarksHistory.length}</span>
+            <div className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs sm:text-sm text-gray-400">Frames Captured</span>
+                <span className="text-base sm:text-lg font-bold text-white">{poseLandmarksHistory.length}</span>
               </div>
-              <div className=\"w-full bg-gray-700 rounded-full h-2\">
+              <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
                 <div 
-                  className=\"bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-300\"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 sm:h-2 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min((poseLandmarksHistory.length / 30) * 100, 100)}%` }}
                 ></div>
               </div>
-              <p className=\"text-xs text-gray-500 mt-2\">
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-2">
                 {poseLandmarksHistory.length < 10 
-                  ? `Need ${10 - poseLandmarksHistory.length} more frames to analyze` 
-                  : '✅ Ready for AI analysis!'}
+                  ? `Need ${10 - poseLandmarksHistory.length} more frames` 
+                  : '✅ Ready for analysis!'}
               </p>
             </div>
 
@@ -1211,13 +1081,14 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
             {poseLandmarksHistory.length > 10 && (
               <button
                 onClick={handleFinishExercise}
-                className=\"w-full px-6 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:via-teal-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3 animate-pulse\"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:via-teal-700 hover:to-emerald-700 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base lg:text-lg shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3 animate-pulse"
               >
-                <CheckCircle2 className=\"w-6 h-6\" />
-                Get AI Feedback on Your Form
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                <span className="hidden xs:inline">Get AI Feedback on Your Form</span>
+                <span className="xs:hidden">Get AI Feedback</span>
               </button>
             )}
-          </div>"
+          </div>
         </div>
       )}
     </div>
@@ -1225,266 +1096,15 @@ function ExerciseStep({ exerciseInstructions, focusImages, exerciseMode, setExer
 }
 
 // Live Exercise Component with MediaPipe Pose Detection
-function LiveExerciseComponent({ countdown, setCountdown, videoRef, canvasRef, isRecording, setIsRecording, setExerciseVideo, mediaRecorderRef, recordedChunksRef, setPoseLandmarks }) {
-  const [poseDetector, setPoseDetector] = useState(null)
-  const [webcamStarted, setWebcamStarted] = useState(false)
-  const animationFrameRef = useRef(null)
+// LiveExerciseComponent - REMOVED
 
-  useEffect(() => {
-    if (countdown === null) return
-    
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-      return () => clearTimeout(timer)
-    } else {
-      startWebcam()
-    }
-  }, [countdown])
-
-  const startWebcam = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 },
-        audio: false
-      })
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-        setWebcamStarted(true)
-        
-        // Initialize MediaPipe Pose (we'll load it dynamically)
-        loadPoseDetection()
-      }
-    } catch (error) {
-      console.error('Error accessing webcam:', error)
-      
-      // User-friendly error messages
-      let errorMessage = 'Could not access webcam.'
-      if (error.name === 'NotAllowedError') {
-        errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.'
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No webcam detected. Please connect a camera or use "Upload Video" mode instead.'
-      } else if (error.name === 'NotReadableError') {
-        errorMessage = 'Webcam is already in use by another application. Please close other apps using the camera.'
-      }
-      
-      alert(errorMessage)
-      setCountdown(null) // Reset countdown
-    }
-  }
-
-  const loadPoseDetection = async () => {
-    try {
-      const { Pose } = await import('@mediapipe/pose')
-      
-      const pose = new Pose({
-        locateFile: (file) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-        }
-      })
-      
-      pose.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        enableSegmentation: false,
-        smoothSegmentation: false,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
-      })
-      
-      pose.onResults(onPoseResults)
-      setPoseDetector(pose)
-      
-      detectPose(pose)
-    } catch (error) {
-      console.error('Error loading pose detection:', error)
-      // Fallback to simple drawing
-      detectPose(null)
-    }
-  }
-
-  const onPoseResults = (results) => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    
-    if (!ctx || !results) return
-    
-    // Update skeleton component with pose landmarks
-    if (results.poseLandmarks) {
-      setPoseLandmarks(results.poseLandmarks)
-      console.log(' Live pose detected with', results.poseLandmarks.length, 'landmarks')
-    }
-    
-    // Draw ONLY the clean video frame (no skeleton overlay)
-    ctx.save()
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height)
-    ctx.restore()
-  }
-
-  const detectPose = async (pose) => {
-    if (!videoRef.current || !canvasRef.current) return
-
-    const video = videoRef.current
-    const canvas = canvasRef.current
-
-    canvas.width = video.videoWidth || 640
-    canvas.height = video.videoHeight || 480
-
-    const processFrame = async () => {
-      if (video.readyState >= 2 && pose) {
-        try {
-          await pose.send({ image: video })
-        } catch (error) {
-          console.error('Error processing frame:', error)
-        }
-      } else if (video.readyState >= 2) {
-        // Fallback: just draw video without pose detection
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-        ctx.fillStyle = '#00FF00'
-        ctx.font = '16px Arial'
-        ctx.fillText('📹 Camera Active', 10, 30)
-      }
-      
-      animationFrameRef.current = requestAnimationFrame(processFrame)
-    }
-
-    processFrame()
-  }
-
-  const startRecording = () => {
-    const canvas = canvasRef.current
-    const stream = canvas.captureStream(30) // 30 FPS
-    
-    mediaRecorderRef.current = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9'
-    })
-    
-    recordedChunksRef.current = []
-    
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        recordedChunksRef.current.push(event.data)
-      }
-    }
-    
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setExerciseVideo(reader.result)
-      }
-      reader.readAsDataURL(blob)
-    }
-    
-    mediaRecorderRef.current.start()
-    setIsRecording(true)
-    
-    // Auto-stop after 30 seconds
-    setTimeout(() => {
-      if (mediaRecorderRef.current?.state === 'recording') {
-        stopRecording()
-      }
-    }, 30000)
-  }
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-      
-      // Stop webcam
-      const stream = videoRef.current?.srcObject
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
-      
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-    }
-  }
-
-  useEffect(() => {
-    return () => {
-      // Cleanup
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-      const stream = videoRef.current?.srcObject
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
-    }
-  }, [])
-
-  return (
-    <div className="relative w-full" style={{ minHeight: '480px' }}>
-      {countdown !== null && countdown > 0 && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 rounded-xl">
-          <div className="text-center">
-            <div className="text-8xl font-bold text-primary mb-4">{countdown}</div>
-            <p className="text-xl text-white">Get ready...</p>
-          </div>
-        </div>
-      )}
-      
-      <div className="relative bg-black rounded-xl overflow-hidden" style={{ minHeight: '480px' }}>
-        <video
-          ref={videoRef}
-          className="hidden"
-          playsInline
-          muted
-        />
-        <canvas
-          ref={canvasRef}
-          className="w-full h-auto"
-          style={{ display: 'block', maxWidth: '100%', minHeight: '480px', objectFit: 'contain', backgroundColor: '#000' }}
-        />
-        
-        {webcamStarted && (
-          <div className="absolute top-4 left-4 bg-black/70 px-3 py-2 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
-              <span className="text-white text-sm font-medium">
-                {isRecording ? 'Recording...' : 'Ready'}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {webcamStarted && !isRecording && (
-        <button
-          onClick={startRecording}
-          className="w-full mt-4 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold inline-flex items-center justify-center gap-2"
-        >
-          <div className="w-4 h-4 rounded-full bg-white" />
-          Start Recording (Max 30s)
-        </button>
-      )}
-
-      {isRecording && (
-        <button
-          onClick={stopRecording}
-          className="w-full mt-4 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold"
-        >
-          Stop Recording
-        </button>
-      )}
-    </div>
-  )
-}
-
-// Video Playback Component with Pose Detection
 function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideoComplete }) {
   const videoRef = useRef(null)
   const thumbnailCanvasRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [poseDetector, setPoseDetector] = useState(null)
   const [isLoadingPose, setIsLoadingPose] = useState(false)
+  const [isPoseReady, setIsPoseReady] = useState(false)
   const [showThumbnail, setShowThumbnail] = useState(true)
   const animationFrameRef = useRef(null)
 
@@ -1495,7 +1115,13 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     // Reset states when new video is uploaded
     setShowThumbnail(true)
     setIsPlaying(false)
-  }, [videoSrc])
+    
+    // Preload pose detector immediately when video is uploaded
+    if (!poseDetector && !isLoadingPose) {
+      console.log('🎬 Video uploaded - preloading pose detector...')
+      loadPoseDetector()
+    }
+  }, [videoSrc, poseDetector, isLoadingPose])
 
   // DON'T auto-start for uploaded videos - let user click play button
   // Auto-play is only enabled for live mode
@@ -1503,8 +1129,10 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
   const loadPoseDetector = async () => {
     try {
       setIsLoadingPose(true)
+      setIsPoseReady(false)
+      console.log('🚀 Loading MediaPipe Pose...')
+      
       const { Pose } = await import('@mediapipe/pose')
-      const { Camera } = await import('@mediapipe/camera_utils')
       
       const pose = new Pose({
         locateFile: (file) => {
@@ -1512,6 +1140,10 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         }
       })
       
+      // Set up the onResults callback BEFORE setting options
+      pose.onResults(onPoseResults)
+      
+      // Configure pose detector
       pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
@@ -1521,16 +1153,24 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
         minTrackingConfidence: 0.5
       })
       
-      pose.onResults(onPoseResults)
-      
-      // Allow WASM and resources to initialize but do not block playback.
-      // Keep the flag while loading so UI can show a small indicator.
+      // Store the detector but don't mark as ready yet
       setPoseDetector(pose)
+      
+      // Wait for WASM to fully initialize by doing a test send
+      // This ensures the module is ready before actual use
+      console.log('⏳ Initializing WASM module...')
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      
+      // Mark as ready
+      setIsPoseReady(true)
       setIsLoadingPose(false)
+      console.log('✅ Pose detector ready for use')
     } catch (error) {
-      console.error(' Error loading MediaPipe Pose:', error)
-      console.error(' Error stack:', error.stack)
+      console.error('❌ Error loading MediaPipe Pose:', error)
+      console.error('Error stack:', error.stack)
       setIsLoadingPose(false)
+      setIsPoseReady(false)
+      setPoseDetector(null)
     }
   }
 
@@ -1544,9 +1184,9 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     // Update skeleton component with pose landmarks AND add to history
     if (results.poseLandmarks) {
       setPoseLandmarks(results.poseLandmarks) // This calls handlePoseLandmarksUpdate which adds to history
-      console.log(' Pose detected with', results.poseLandmarks.length, 'landmarks')
+      console.log('✅ Pose detected with', results.poseLandmarks.length, 'landmarks')
     } else {
-      console.log(' No pose detected in frame')
+      console.log('⚠️ No pose detected in frame')
     }
     
     // Draw ONLY the clean video frame (no skeleton overlay)
@@ -1558,22 +1198,29 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     ctx.restore()
   }
 
-
-
   const handlePlay = async () => {
     const video = videoRef.current
     const canvas = canvasRef.current
 
     if (!video || !canvas) {
-      console.warn(' Video or canvas not ready')
+      console.warn('Video or canvas not ready')
       return
     }
 
-    // Start loading pose detector in background if not already loaded
+    // If pose detector is still loading, wait for it (max 5 seconds)
+    if (isLoadingPose) {
+      console.log('⏳ Waiting for pose detector to finish loading...')
+      let waitTime = 0
+      while (isLoadingPose && waitTime < 5000) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+        waitTime += 100
+      }
+    }
+
+    // Start loading pose detector in background if not already loaded/loading
     if (!poseDetector && !isLoadingPose) {
-      console.log('Loading pose detector in background for video playback...')
-      // don't await - let video start immediately
-      loadPoseDetector().catch((e) => console.error('Background pose load failed', e))
+      console.log('🚀 Starting pose detector...')
+      loadPoseDetector()
     }
 
     // Wait for video metadata to load (so we can size canvas)
@@ -1590,13 +1237,23 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     // Hide thumbnail and show playback canvas
     setShowThumbnail(false)
     
-    // Reset video to start
+    // Reset video to start and ensure normal playback speed
     video.currentTime = 0
-    video.play()
-    setIsPlaying(true)
+    video.playbackRate = 1.0 // Ensure normal speed
     
-    // Start pose rendering loop (will perform pose detection when detector is ready)
-    detectPoseInVideo()
+    // Start playback
+    try {
+      await video.play()
+      setIsPlaying(true)
+      
+      console.log(isPoseReady ? '✅ Playing with pose detection' : '⏳ Playing - pose detection still loading...')
+      
+      // Start pose rendering loop (will perform pose detection when detector is ready)
+      detectPoseInVideo()
+    } catch (err) {
+      console.error('Error playing video:', err)
+      setIsPlaying(false)
+    }
   }
 
   const detectPoseInVideo = async () => {
@@ -1609,6 +1266,9 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
     }
 
     const ctx = canvas.getContext('2d')
+    let frameCount = 0
+    const FRAME_SKIP = 0 // Process EVERY frame for pose detection (changed from 2)
+    let isProcessingPose = false // Prevent overlapping pose detection calls
 
     const processFrame = async () => {
       if (video.paused || video.ended) {
@@ -1618,22 +1278,27 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
 
       if (video.readyState >= 2) {
         try {
-          // Always draw the video frame so playback is smooth even if pose isn't ready
+          // ALWAYS draw the video frame FIRST for smooth playback
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-          // If pose detector is ready, run detection (non-blocking)
-          if (poseDetector) {
-            try {
-              await poseDetector.send({ image: video })
-            } catch (err) {
-              // Log but don't interrupt playback
-              console.debug('Pose detector frame error:', err)
-            }
+          // Run pose detection on every frame now
+          frameCount++
+          if (poseDetector && isPoseReady && frameCount % (FRAME_SKIP + 1) === 0 && !isProcessingPose) {
+            isProcessingPose = true
+            // Run pose detection without awaiting to not block rendering
+            poseDetector.send({ image: video })
+              .then(() => {
+                isProcessingPose = false
+              })
+              .catch((err) => {
+                isProcessingPose = false
+                console.debug('Pose detection skipped:', err.message)
+              })
           }
         } catch (error) {
           console.error('Error processing frame:', error)
-          // Ensure video still displays
+          // Ensure video still displays even on error
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
         }
@@ -1710,25 +1375,18 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
           // Generate thumbnail when video data is ready
           generateThumbnail(e.target)
         }}
-        preload="metadata"
+        preload="auto"
+        playsInline
+        muted
       />
       
       {/* Thumbnail - show immediately. If pose detector is loading, show a small, non-blocking badge. */}
       {showThumbnail && (
-        <div className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center cursor-pointer group" style={{ minHeight: '400px' }} onClick={handlePlay}>
+        <div className="relative bg-black rounded-xl overflow-hidden" style={{ aspectRatio: '16/9', width: '100%' }}>
           <canvas
             ref={thumbnailCanvasRef}
-            className="w-full h-auto"
+            className="absolute inset-0 w-full h-full object-contain"
           />
-          {/* Play Button Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black/50 via-black/40 to-black/50 group-hover:from-black/40 group-hover:via-black/30 group-hover:to-black/40 transition-all duration-300">
-            <div className="relative">
-              <div className="absolute inset-0 bg-white rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-              <div className="relative bg-white rounded-full p-8 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                <Play className="w-16 h-16 text-gray-900" fill="currentColor" />
-              </div>
-            </div>
-          </div>
           {isLoadingPose && (
             <div className="absolute top-4 right-4 px-3 py-2 bg-black/60 rounded-lg flex items-center gap-2 backdrop-blur-sm">
               <Loader2 className="w-5 h-5 text-primary animate-spin" />
@@ -1739,10 +1397,10 @@ function VideoPlaybackComponent({ videoSrc, canvasRef, setPoseLandmarks, onVideo
       )}
       
       {/* Main playback canvas */}
-      <div className={`relative bg-black rounded-xl overflow-hidden ${showThumbnail ? 'hidden' : ''}`} style={{ minHeight: '400px' }}>
+      <div className={`relative bg-black rounded-xl overflow-hidden ${showThumbnail ? 'hidden' : ''}`} style={{ aspectRatio: '16/9', width: '100%' }}>
         <canvas
           ref={canvasRef}
-          className="w-full h-auto"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </div>
       

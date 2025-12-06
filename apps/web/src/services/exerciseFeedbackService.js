@@ -238,6 +238,7 @@ function calculateMovementMetrics(history, exercise) {
     kneeMovement: kneeMovement.toFixed(2),
     wristMovement: wristMovement.toFixed(2),
     ankleMovement: ankleMovement.toFixed(2),
+    hipMovement: hipMovement.toFixed(2),
     bodyStability: (bodyStability / frames).toFixed(4),
     movementScore: (shoulderMovement + elbowMovement + kneeMovement + wristMovement + ankleMovement) / frames,
     kneeRange,
